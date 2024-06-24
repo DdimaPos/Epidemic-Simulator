@@ -40,8 +40,8 @@ function Parameters({responseData, sliderValue, setSlidervalue, submitHandler}){
         //console.log(countAll)
         const canvas=canvasRef.current;
 
-        const width = 400
-        const height = 200
+        const width = 750
+        const height = 300
         const marginTop = 20
         const marginBottom = 20
         const marginRight = 20
