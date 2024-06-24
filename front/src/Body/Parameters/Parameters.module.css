@@ -2,12 +2,12 @@
     width: 45%;
 }
 .graph{
-    width: 80%;
+    /*width: 80%;*/
     margin: 0 auto;
 }
 .canvas{
     background-color: black;
-    width: 100%;
+    /*width: 100%;*/
 }
 .buttons{
     display: flex;

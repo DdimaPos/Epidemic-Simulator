@@ -1,46 +1,31 @@
 import styles from "./Parameters.module.css"
 import Slider from "./Slider/Slider"
 import {useEffect, useState, useRef} from 'react'
+import * as d3 from "d3"
 function Parameters({responseData, sliderValue, setSlidervalue, submitHandler}){
     const [selectedPreset, setSelectedPreset]=useState('');
-    const [counter, setCounter]=useState(1);
+    //const [counter, setCounter]=useState(1);
+    const [countAll, setCountAll]=useState([[]])
     const [count_dead, setCount_dead]=useState([0, 0]);
     const [count_infected, setCount_infected]=useState([0, 0]);
     
     const infectionPresets=[
         {name:"Custom",infection_probability:'1', infection_radius:'1', movement_speed: '1', probability_of_dying:'10'},
-        {name:"Covid-19",infection_probability:'50', infection_radius:'100', movement_speed: '50', probability_of_dying:'10'},
-        {name:"EBOLA",infection_probability:'20', infection_radius:'1', movement_speed: '1', probability_of_dying:'10'},
-        {name:"HIV",infection_probability:'10', infection_radius:'1', movement_speed: '1', probability_of_dying:'10'},
+        {name:"Covid-19",infection_probability:'50', infection_radius:'70', movement_speed: '5', probability_of_dying:'30'},
+        {name:"EBOLA",infection_probability:'40', infection_radius:'70', movement_speed: '6', probability_of_dying:'80'},
+        {name:"HIV",infection_probability:'20', infection_radius:'70', movement_speed: '3', probability_of_dying:'50'},
     ]
     const sliderNames = ["Movement speed","Number of individuals", "Number of iterations", "Infection Radius", "Infection probability", "Dying probability"];
     
     /////canvas handling
     const canvasRef=useRef(null);
-    let x_values=[];
 
     function resetCanvas(){
-        const canvas=canvasRef.current;
-        const ctx=canvas.getContext("2d");
         setCount_dead([0,0]);
         setCount_infected([0,0]);
-        setCounter(1);
-
-        ctx.beginPath();
-        ctx.fillStyle = '#3754e6';
-        ctx.fillRect(0,0,canvas.width, canvas.height)
-        ctx.fill();
-        ctx.closePath();
-
     }
     
     useEffect(()=>{
-        const canvas=canvasRef.current;
-        canvas.width = 7000;
-        canvas.height = 3000;
-        const ctx=canvas.getContext("2d");
-        const pixels_per_unit=canvas.height/responseData.length;
-        x_values=[];
         
         let dead_counter=0;
         let infected_counter=0;
@@ -48,53 +33,70 @@ function Parameters({responseData, sliderValue, setSlidervalue, submitHandler}){
             if(responseData[i].is_infected) infected_counter++;
             if(!responseData[i].is_infected && !responseData[i].alive) dead_counter++; 
         }
-        setCount_dead([...count_dead, dead_counter*pixels_per_unit]);
-        setCount_infected([...count_infected, (infected_counter+dead_counter)*pixels_per_unit]);
+        setCount_dead([...count_dead, dead_counter]);
+        setCount_infected([...count_infected, (infected_counter+dead_counter)]);
+        setCountAll([count_dead, count_infected]);
+
+        //console.log(countAll)
+        const canvas=canvasRef.current;
+
+        const width = 400
+        const height = 200
+        const marginTop = 20
+        const marginBottom = 20
+        const marginRight = 20
+        const marginLeft = 25
+
+        const innerWidth = width - marginLeft - marginRight;
+        const innerHeight = height - marginTop -  marginBottom;
+
+        const data = countAll;
+                
+        const series = d3.stack().keys(d3.range(data.length))(d3.transpose(data));
         
-        let step=canvas.width/counter;
+        d3.select(canvas).selectAll('*').remove();
         
-        for(let i=0;i<counter+1; i++){
-            x_values.push(step*i);
-        }
+        const xScale = d3.scaleLinear()
+            .domain([0, data[0].length - 1])
+            .range([0, innerWidth]);
+
+        const yScale = d3.scaleLinear()
+            .domain([0, 100])
+            .range([innerHeight, 0]);
+
+        const xAxis = d3.axisBottom(xScale);
+
+        const yAxis = d3.axisLeft(yScale);
+
+        let svg = d3.select(canvas)
+            .attr("width", width)
+            .attr("height", height)
+            .append("g")
+            .attr("transform", `translate(${marginLeft}, ${marginTop})`)
+
+        const colors = ["grey","red", "blue"]
+
+        // Create the area generator
+        const area = d3.area()
+            .x((d, i) => xScale(i))
+            .y0(d => yScale(d[0]))
+            .y1(d => yScale(d[1]))
+            .curve(d3.curveMonotoneX); // Smooth the line
+
+        // Create the stacked areas
+        svg.selectAll("path")
+            .data(series)
+            .enter().append("path")
+            .attr("fill", (d, i) => colors[i])
+            .attr("d", area);
+
+        svg.append("g")
+            .attr("transform", `translate(0, ${innerHeight})`)
+            .call(xAxis);
+        svg.append("g")
+            .call(yAxis)
         
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        //make a shape for alive
-        ctx.beginPath();
-        ctx.fillStyle = '#3754e6';
-        ctx.fillRect(0,0,canvas.width, canvas.height)
-        ctx.fill();
-        ctx.closePath();
-
-
-        //make a shape for infected
-        ctx.beginPath();
-        ctx.moveTo(0, canvas.height); 
-        for(let i=0; i<x_values.length; i++){
-            ctx.lineTo(x_values[i], canvas.height-count_infected[i]);   
-        }
         
-        ctx.lineTo(x_values[x_values.length-1], canvas.height);
-        ctx.lineTo(0, canvas.height);
-        ctx.fillStyle = '#e62727';
-        ctx.fill();
-        ctx.closePath();
-
-
-
-        ctx.beginPath();
-        ctx.moveTo(0, canvas.height);
- 
-        for(let i=0; i<x_values.length; i++){
-            ctx.lineTo(x_values[i], canvas.height-count_dead[i]);   
-
-        }
-        ctx.lineTo(x_values[x_values.length-1], canvas.height);
-        ctx.lineTo(0, canvas.height);
-        ctx.fillStyle = '#6e6e6e';
-        ctx.fill();
-        ctx.closePath();
-
-        setCounter(counter+1)
     },[responseData]);
     
     
@@ -128,8 +130,8 @@ function Parameters({responseData, sliderValue, setSlidervalue, submitHandler}){
     return(
         <div className={styles.wrapper}>
             <div className={styles.graph}>
-                <canvas ref={canvasRef} className={styles.canvas} >
-                </canvas>
+                <svg ref={canvasRef} className={styles.canvas} >
+                </svg>
             </div>
             <div className={styles.settings}>
                 <div className={styles.buttons}>
