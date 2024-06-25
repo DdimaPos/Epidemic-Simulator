@@ -17,12 +17,6 @@ function Body(){
     const [error, setError] = useState(null);
     const [websocket, setWebsocket]=useState(null);
     
-    /*useEffect(() => {//function only to see if canvas works
-        setResponseData([
-            { id: 1, position: [10,10], infected: true, alive: false }, 
-            
-        ]);
-    }, []);    */
     const submitHandler = async (e) => {
         console.log(e);
         let requiredDataString = JSON.stringify(sliderValue);
@@ -52,6 +46,12 @@ function Body(){
         };
         setWebsocket(webSocket);
     };
+    const Reset = () =>{
+        if (websocket) {
+            websocket.close();
+        }
+        setResponseData('');
+    }
     
     return(
         <div className={styles.body}>
@@ -60,7 +60,7 @@ function Body(){
                 sliderValue={sliderValue} 
                 setSlidervalue={setSlidervalue}
                 submitHandler={submitHandler}/>
-            <Map responseData={responseData}/>
+            <Map responseData={responseData} resetFunc={Reset}/>
             
         </div>
     )

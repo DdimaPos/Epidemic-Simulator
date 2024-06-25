@@ -2,15 +2,15 @@ import styles from "./Parameters.module.css"
 import Slider from "./Slider/Slider"
 import {useEffect, useState, useRef} from 'react'
 import * as d3 from "d3"
-function Parameters({responseData, sliderValue, setSlidervalue, submitHandler}){
+
+export default function Parameters({responseData, sliderValue, setSlidervalue, submitHandler}){
     const [selectedPreset, setSelectedPreset]=useState('');
-    //const [counter, setCounter]=useState(1);
     const [countAll, setCountAll]=useState([[]])
     const [count_dead, setCount_dead]=useState([0, 0]);
     const [count_infected, setCount_infected]=useState([0, 0]);
     
     const infectionPresets=[
-        {name:"Custom",infection_probability:'1', infection_radius:'1', movement_speed: '1', probability_of_dying:'10'},
+        {name:"Custom",infection_probability:'50', infection_radius:'50', movement_speed: '5', probability_of_dying:'50'},
         {name:"Covid-19",infection_probability:'50', infection_radius:'70', movement_speed: '5', probability_of_dying:'30'},
         {name:"EBOLA",infection_probability:'40', infection_radius:'70', movement_speed: '6', probability_of_dying:'80'},
         {name:"HIV",infection_probability:'20', infection_radius:'70', movement_speed: '3', probability_of_dying:'50'},
@@ -26,7 +26,7 @@ function Parameters({responseData, sliderValue, setSlidervalue, submitHandler}){
     }
     
     useEffect(()=>{
-        
+        //performing operations to count the number of individuals of each state
         let dead_counter=0;
         let infected_counter=0;
         for(let i=0; i<responseData.length; i++){
@@ -37,11 +37,10 @@ function Parameters({responseData, sliderValue, setSlidervalue, submitHandler}){
         setCount_infected([...count_infected, (infected_counter+dead_counter)]);
         setCountAll([count_dead, count_infected]);
 
-        //console.log(countAll)
         const canvas=canvasRef.current;
-
-        const width = 750
-        const height = 300
+        //get the displaying width and height on page
+        //console.log(canvas.getBoundingClientRect())
+        const { width, height } = canvas.getBoundingClientRect();
         const marginTop = 20
         const marginBottom = 20
         const marginRight = 20
@@ -53,7 +52,7 @@ function Parameters({responseData, sliderValue, setSlidervalue, submitHandler}){
         const data = countAll;
                 
         const series = d3.stack().keys(d3.range(data.length))(d3.transpose(data));
-        
+        //delete previous data
         d3.select(canvas).selectAll('*').remove();
         
         const xScale = d3.scaleLinear()
@@ -64,8 +63,8 @@ function Parameters({responseData, sliderValue, setSlidervalue, submitHandler}){
             .domain([0, 100])
             .range([innerHeight, 0]);
 
+        //define the axis
         const xAxis = d3.axisBottom(xScale);
-
         const yAxis = d3.axisLeft(yScale);
 
         let svg = d3.select(canvas)
@@ -90,6 +89,7 @@ function Parameters({responseData, sliderValue, setSlidervalue, submitHandler}){
             .attr("fill", (d, i) => colors[i])
             .attr("d", area);
 
+        //call the axis
         svg.append("g")
             .attr("transform", `translate(0, ${innerHeight})`)
             .call(xAxis);
@@ -111,9 +111,6 @@ function Parameters({responseData, sliderValue, setSlidervalue, submitHandler}){
             infection_probability: selectedPreset.infection_probability,
             infection_radius: selectedPreset.infection_radius,
             probability_of_dying: selectedPreset.probability_of_dying,
-            
-            //num_individuals: selectedPreset.num_individuals,
-            //num_iterations: selectedPreset.num_iterations,
         });
     }
     function selectObjectByName(name) {
@@ -155,10 +152,3 @@ function Parameters({responseData, sliderValue, setSlidervalue, submitHandler}){
         </div>
     )
 }
-export default Parameters;
-/*<Slider minmax={['1','100']} onChange={handleParam} sliderValue={sliderValue.Infectioness} name="Infectioness" prop_name={sliderNames[1]}/>
-                    <Slider minmax={['1','100']} onChange={handleParam} sliderValue={sliderValue.Radius} name="Radius" prop_name={sliderNames[2]}/>
-                    <Slider minmax={['1','100']} onChange={handleParam} sliderValue={sliderValue.Distancing} name="Distancing" prop_name={sliderNames[3]}/>
-                    <Slider minmax={['1','100']} onChange={handleParam} sliderValue={sliderValue.Speed} name="Speed" prop_name={sliderNames[4]}/>
-                    <Slider minmax={['1','100']} onChange={handleParam} sliderValue={sliderValue.Quarantine} name="Quarantine" prop_name={sliderNames[5]}/>
-                    <Slider minmax={['1','100']} onChange={handleParam} sliderValue={sliderValue.Iterations} name="Iterations" prop_name={sliderNames[6]}/>*/   

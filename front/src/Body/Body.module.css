@@ -3,6 +3,7 @@
     justify-content: space-around;
     align-items: center;
     flex: 0 0 50%;
+    margin-bottom: 20px;
 }
 @media(max-width: 750px){
     .body{

@@ -1,7 +1,7 @@
 import React, { useState , useRef, useEffect} from 'react';
 import styles from "./Map.module.css";
 
-function Map({responseData}) {
+function Map({responseData, resetFunc}) {
     const [isPaused, setIsPaused] = useState(true);
     const canvasRef=useRef(null);
     let scale=1;
@@ -54,11 +54,7 @@ function Map({responseData}) {
                 <div className={styles.pausePlayContainer}>
                     <button onClick={handlePausePlayClick} style={{ minWidth: '100px' }}>{isPaused ?'Pause' : 'Play'}</button>
                 </div>
-                <button style={{ minWidth: '100px' }}>Reset</button>
-            </div>
-            <div className={styles.settings_buttons}>
-                <button className={styles.simple_button}>Simple</button>
-                <button className={styles.community_button}>Communities</button>
+                <button onClick={resetFunc} style={{ minWidth: '100px' }}>Reset</button>
             </div>
         </div>
     );
