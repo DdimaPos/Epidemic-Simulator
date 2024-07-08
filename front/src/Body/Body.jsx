@@ -42,6 +42,7 @@ function Body(){
         webSocket.onerror = (error) => {
             console.error("Error:", error);
             setError(error.message);
+            alert("I am sorry, but server is not working now")
             webSocket.close();
         };
         setWebsocket(webSocket);
