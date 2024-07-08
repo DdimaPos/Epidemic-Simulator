@@ -6,5 +6,6 @@ export default defineConfig({
   plugins: [react(), nodePolyfills()],
   optimizeDeps: {
     exclude: ['js-big-decimal']
-  }
+  },
+  base: '/Epidemic-Simulator/'
 })
