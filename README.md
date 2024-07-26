@@ -12,4 +12,4 @@ Stacked graph was implemented using D3.js library
 # Backend
 Server written in Rust using tokio library
 # Algorithm
-Algorithm can be found here [link](back/src/algorithm.rs)
+Algorithm can be found here [link](backend/src/algorithm.rs)
