@@ -1,11 +1,12 @@
 .wrapper{
+    height: 400px;
     width: 45%;
     margin-top: 10px;
 }
 .graph{
     width: 90%;
     margin: 0 auto;
-    height: 90%;
+    height: 100%;
 }
 .canvas{
     background-color: black;
@@ -17,6 +18,7 @@
     justify-content: space-between;
 }
 .settings{
+    
     display: flex;
     flex-direction: column;
 }

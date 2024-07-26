@@ -28,7 +28,7 @@ function Body(){
     };
     const startWebSocket = (requiredDataString) => {
         
-        const webSocket = new WebSocket('ws://192.168.1.196:8080/'); // websocket endpoint on server
+        const webSocket = new WebSocket('ws://192.168.1.189:8080/'); // websocket endpoint on server
         webSocket.onopen = () => {
             console.log('Connected to server');
             webSocket.send(requiredDataString);
