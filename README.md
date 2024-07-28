@@ -13,5 +13,5 @@ Stacked graph was implemented using D3.js library
 Server written in Rust using tokio library
 # Algorithm
 Algorithm can be found here [link](backend/src/algorithm.rs)
-#Docker
+# Docker
 Backend and frontend have their own Docker files that are chained together using docker compose. **Project is ready to be deployed on a server**
